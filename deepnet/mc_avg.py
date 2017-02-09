@@ -11,7 +11,7 @@ def ExtractRepresentations(model_file, train_op_file, layernames,
   model = util.ReadModel(model_file)
   op = ReadOperation(train_op_file)
   op.randomize = False
-  net = CreateDeepnet(model, op, op)
+  net = create_deepnet(model, op, op)
   net.LoadModelOnGPU()
   net.SetUpData()
   for i in range(k):

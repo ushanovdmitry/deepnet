@@ -1,0 +1,140 @@
+{
+  "layer": [
+    {
+      "dataField": {
+        "test": "test_data", 
+        "train": "train_data", 
+        "validation": "validation_data"
+      }, 
+      "hyperparams": {
+        "activation": "LOGISTIC", 
+        "dropoutProb": 0.2
+      }, 
+      "isInput": true, 
+      "name": "input_layer", 
+      "dimensions": 784
+    }, 
+    {
+      "name": "output_layer", 
+      "hyperparams": {
+        "applyL2Decay": false, 
+        "sparsity": false, 
+        "dropout": false, 
+        "enableDisplay": false, 
+        "activation": "SOFTMAX"
+      }, 
+      "param": [
+        {
+          "initialization": "CONSTANT", 
+          "name": "bias"
+        }
+      ], 
+      "performanceStats": {
+        "computeCorrectPreds": true, 
+        "computeCrossEntropy": true
+      }, 
+      "dimensions": 1, 
+      "numlabels": 10, 
+      "dataField": {
+        "test": "test_labels", 
+        "train": "train_labels", 
+        "validation": "validation_labels"
+      }, 
+      "lossFunction": "CROSS_ENTROPY", 
+      "isOutput": true
+    }, 
+    {
+      "name": "hidden1", 
+      "param": [
+        {
+          "initialization": "CONSTANT", 
+          "name": "bias"
+        }
+      ], 
+      "dimensions": 1024
+    }, 
+    {
+      "name": "hidden2", 
+      "param": [
+        {
+          "initialization": "CONSTANT", 
+          "name": "bias"
+        }
+      ], 
+      "dimensions": 1024
+    }, 
+    {
+      "name": "hidden3", 
+      "param": [
+        {
+          "initialization": "CONSTANT", 
+          "name": "bias"
+        }
+      ], 
+      "dimensions": 2048
+    }
+  ], 
+  "name": "mnist_3layer_relu_dropout", 
+  "hyperparams": {
+    "applyWeightNorm": true, 
+    "baseEpsilon": 1.0, 
+    "dropout": true, 
+    "initialMomentum": 0.5, 
+    "weightNorm": 3.0, 
+    "finalMomentum": 0.99, 
+    "momentumChangeSteps": 100000, 
+    "epsilonDecayHalfLife": 10000, 
+    "dropoutProb": 0.5, 
+    "epsilonDecay": "INVERSE_T", 
+    "applyL2Decay": false, 
+    "activation": "RECTIFIED_LINEAR", 
+    "adapt": "NO_ADAPT"
+  }, 
+  "modelType": "FEED_FORWARD_NET", 
+  "edge": [
+    {
+      "node1": "input_layer", 
+      "node2": "hidden1", 
+      "param": [
+        {
+          "initialization": "DENSE_GAUSSIAN_SQRT_FAN_IN", 
+          "name": "weight"
+        }
+      ]
+    }, 
+    {
+      "node1": "hidden1", 
+      "node2": "hidden2", 
+      "param": [
+        {
+          "initialization": "DENSE_GAUSSIAN_SQRT_FAN_IN", 
+          "sigma": 1.0, 
+          "name": "weight"
+        }
+      ]
+    }, 
+    {
+      "node1": "hidden2", 
+      "node2": "hidden3", 
+      "param": [
+        {
+          "initialization": "DENSE_GAUSSIAN_SQRT_FAN_IN", 
+          "sigma": 1.0, 
+          "name": "weight"
+        }
+      ]
+    }, 
+    {
+      "node1": "hidden3", 
+      "node2": "output_layer", 
+      "param": [
+        {
+          "initialization": "DENSE_GAUSSIAN_SQRT_FAN_IN", 
+          "sigma": 1.0, 
+          "name": "weight"
+        }
+      ]
+    }
+  ], 
+  "seed": 42
+}

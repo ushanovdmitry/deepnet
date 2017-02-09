@@ -8,7 +8,6 @@ import visualize
 import pdb
 
 class Parameter(object):
-
   def __init__(self):
     self.num_shares = 1
     self.num_grads_received = 0

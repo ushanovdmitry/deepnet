@@ -18,7 +18,7 @@ class DBN(DBM):
   def CopyModelToCPU(self):
     self.rbm.CopyModelToCPU()
 
-  def DeepCopy(self):
+  def deep_copy(self):
     return CopyModel(self.rbm.net)
 
   def Show(self):
@@ -27,13 +27,13 @@ class DBN(DBM):
     self.upward_net.Show()
     self.downward_net.Show()
 
-  def PrintNetwork(self):
+  def print_network(self):
     print 'RBM:'
-    self.rbm.PrintNetwork()
+    self.rbm.print_network()
     print 'Up:'
-    self.upward_net.PrintNetwork()
+    self.upward_net.print_network()
     print 'Down:'
-    self.downward_net.PrintNetwork()
+    self.downward_net.print_network()
 
   def ExchangeGlobalInfo(self):
     for layer in self.rbm.layer:

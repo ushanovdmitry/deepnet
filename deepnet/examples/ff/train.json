@@ -1,0 +1,16 @@
+{
+  "checkpointAfter": 10000000, 
+  "stopcondition": {
+    "steps": 5000, 
+    "allProcessed": false
+  }, 
+  "dataProto": "C:\\IMR\\model\\deepnet\\mnist\\mnist.pbtxt", 
+  "optimizer": "GRADIENT_DESCENT", 
+  "verbose": true, 
+  "batchsize": 100, 
+  "evalAfter": 500, 
+  "train": true, 
+  "showAfter": 500, 
+  "checkpointDirectory": "C:\\IMR\\model\\deepnet\\temp", 
+  "randomize": true
+}

@@ -1,0 +1,6 @@
+{
+  "stopcondition": {
+    "allProcessed": true
+  }, 
+  "batchsize": 100
+}

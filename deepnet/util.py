@@ -141,14 +141,32 @@ def Accumulate(acc, perf):
  acc.correct_preds += perf.correct_preds
  acc.sparsity += perf.sparsity
 
-def CreateLayer(layer_class, proto, *args, **kwargs):
-  for cls in layer_class.__subclasses__():
-    if cls.IsLayerType(proto):
-      return cls(proto, *args, **kwargs)
-    l = CreateLayer(cls, proto, *args, **kwargs)
-    if l is not None:
-      return l
-  return None
+
+def create_layer(activation, *args, **kwargs):
+  from replicated_softmax_layer import ReplicatedSoftmaxLayer
+  from tanh_layer import TanhLayer
+  from relu_layer import ReluLayer
+  from softmax_layer import SoftmaxLayer
+  from logistic_layer import LogisticLayer
+  from smooth_relu_layer import SmoothReluLayer
+  from sin_layer import SinLayer
+  from cos_layer import CosLayer
+  from linear_layer import LinearLayer
+
+  activation2layer = {
+    "REPLICATED_SOFTMAX": ReplicatedSoftmaxLayer,
+    "TANH": TanhLayer,
+    "RECTIFIED_LINEAR": ReluLayer,
+    "SOFTMAX": SoftmaxLayer,
+    "LOGISTIC": LogisticLayer,
+    "RECTIFIED_LINEAR_SMOOTH": SmoothReluLayer,
+    "SIN": SinLayer,
+    "COS": CosLayer,
+    "LINEAR": LinearLayer
+  }
+
+  return activation2layer[activation](*args, **kwargs)
+
 
 def CreateEdge(edge_class, proto, *args, **kwargs):
   for cls in edge_class.__subclasses__():
@@ -180,3 +198,9 @@ def load(fname, target_dict, verbose = False):
     for var in var_list:
         target_dict[var] = pickle.load(fo)
     fo.close()
+
+
+def load_missing(dict_main, dict_secondary):
+  for k in dict_secondary.keys():
+    if k not in dict_main:
+      dict_main[k] = dict_secondary[k]

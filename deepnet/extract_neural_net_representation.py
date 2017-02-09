@@ -18,7 +18,7 @@ def ExtractRepresentations(model_file, train_op_file, layernames,
     os.makedirs(base_output_dir)
   op.randomize = False
   op.get_last_piece = True
-  net = CreateDeepnet(model, op, op)
+  net = create_deepnet(model, op, op)
   net.LoadModelOnGPU()
   net.SetUpData(skip_outputs=skip_outputs)
 

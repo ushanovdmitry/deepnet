@@ -21,7 +21,7 @@ def ExtractRepresentations(model_file, train_op_file, layernames,
   if not os.path.isdir(base_output_dir):
     os.makedirs(base_output_dir)
 
-  net = CreateDeepnet(model, op, op)
+  net = create_deepnet(model, op, op)
   net.LoadModelOnGPU()
   net.SetUpData()
 

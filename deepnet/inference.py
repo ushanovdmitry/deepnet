@@ -12,7 +12,7 @@ def DoInference(model_file, train_op_file, base_output_dir, layernames,
   op.get_last_piece = True
   if data_proto:
     op.data_proto = data_proto
-  net = CreateDeepnet(model, op, op)
+  net = create_deepnet(model, op, op)
   net.LoadModelOnGPU()
   net.SetUpData(skip_layernames=layernames_to_unclamp)
 
