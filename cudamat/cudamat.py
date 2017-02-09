@@ -4,10 +4,8 @@ import numpy as np
 
 MAX_ONES = 1024*256
 
-if platform.system() == 'Windows':
-    _cudamat = ct.cdll.LoadLibrary('libcudamat.dll')
-else:
-    _cudamat = ct.cdll.LoadLibrary('libcudamat.so')
+_cudamat = ct.cdll.LoadLibrary(os.path.dirname(os.path.realpath(__file__)) + '/libcudamat.dll')
+
 
 _cudamat.get_last_cuda_error.restype = ct.c_char_p
 _cudamat.cublas_init.restype = ct.c_int
@@ -1872,7 +1870,7 @@ def cuda_set_device(dev_id):
     Selects the CUDA device with the given ID.
     """
 
-    err_code =  _cudamat.cuda_set_device(ct.c_int(dev_id))
+    err_code = _cudamat.cuda_set_device(ct.c_int(dev_id))
     if err_code:
         raise generate_exception(err_code)
 
@@ -1882,7 +1880,7 @@ def cublas_init():
     """
 
     _cudamat.cublas_init()
-    CUDAMatrix.ones = CUDAMatrix(np.ones((MAX_ONES, 1), dtype=np.float32, order = 'F'))
+    CUDAMatrix.ones = CUDAMatrix(np.ones((MAX_ONES, 1), dtype=np.float32, order='F'))
 
 init = cublas_init
 

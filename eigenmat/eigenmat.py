@@ -3,7 +3,8 @@ import ctypes as ct
 import numpy as np
 
 if platform.system() == 'Windows':
-  _eigenmat = ct.cdll.LoadLibrary('libeigenmat.dll')
+  _eigenmat = ct.windll.LoadLibrary(r'C:\IMR\model\deepnet\eigenmat\libeigenmat.dll')
+  # ct.cdll.LoadLibrary(r'C:\IMR\model\deepnet\eigenmat\libeigenmat.dll')
 elif platform.system() == 'Darwin':
   _eigenmat = ct.cdll.LoadLibrary('libeigenmat.dylib')
 else:

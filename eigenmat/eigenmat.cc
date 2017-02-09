@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <Eigen/Dense>
+#include "eigen\Eigen\Dense"
 #include "eigenmat.h"
 #include "ziggurat.h"
 
@@ -1312,6 +1312,7 @@ extern int add_scalar(eigenmat* mat, float alpha, eigenmat* target) {
   return 0;
 }
 
+__declspec(dllexport)
 extern float euclid_norm(eigenmat* mat) {
   const int len = mat->size[0]*mat->size[1];
   Eigen::Map<Eigen::VectorXf> eig_mat(mat->data, len);

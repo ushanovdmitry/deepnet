@@ -217,7 +217,7 @@ if __name__ == '__main__':
     D = int(sys.argv[3]) #10 # number of words.
   m = dbm.DBM(model_file)
   m.LoadModelOnGPU(batchsize=numchains)
-  plt.ion()
+  # plt.ion()
   log_z = AISReplicatedSoftmax(m, D, numchains, display=True)
   print 'Log Z %.5f' % log_z
   #log_z = AIS(m, schedule)

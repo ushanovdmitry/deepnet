@@ -22,12 +22,14 @@ inline bool checkCUDAError() {
     return cudaSuccess != err;
 }
 
+__declspec(dllexport)
 extern const char* get_last_cuda_error() {
     cudaError_t err = cudaGetLastError();
 
     return cudaGetErrorString( err);
 }
 
+__declspec(dllexport)
 extern int cublas_init() {
     cublasInit();
     if (check_cublas_error())
@@ -36,13 +38,14 @@ extern int cublas_init() {
         return 0;
 }
 
+__declspec(dllexport)
 extern int cublas_shutdown() {
     cublasShutdown();
     cudaThreadExit();
     return 0;
 }
 
-
+__declspec(dllexport)
 extern int cuda_set_device(int deviceId) {
     cudaSetDevice(deviceId);
     
@@ -52,6 +55,7 @@ extern int cuda_set_device(int deviceId) {
         return 0;
 }
 
+__declspec(dllexport)
 extern int init_random(rnd_struct* rnd_state, int seed, char* cudamatpath) {
     unsigned int * host_mults;
     host_mults = (unsigned int*)malloc(NUM_RND_STREAMS * sizeof(unsigned int));
@@ -84,14 +88,17 @@ extern int init_random(rnd_struct* rnd_state, int seed, char* cudamatpath) {
 
 /* ------------------------------ Utility routines ------------------------------ */
 
+__declspec(dllexport)
 extern int get_leading_dimension(cudamat* mat) {
     return mat->is_trans ? mat->size[1] : mat->size[0];
 }
 
+__declspec(dllexport)
 extern int get_nonleading_dimension(cudamat* mat) {
     return mat->is_trans ? mat->size[0] : mat->size[1];
 }
 
+__declspec(dllexport)
 extern void set_transpose(cudamat* mat, int is_trans) {
     mat->is_trans = is_trans;
 }
@@ -100,12 +107,13 @@ inline char get_transpose_char(cudamat* mat) {
     return mat->is_trans ? 't' : 'n';
 }
 
+__declspec(dllexport)
 extern void cuda_sync_threads() {
     cudaThreadSynchronize();
 }
 
 /* ------------------------------ Allocating/moving data ------------------------------ */
-
+__declspec(dllexport)
 extern int allocate_device_memory(cudamat* mat) {
     int len = mat->size[0]*mat->size[1];
 
@@ -122,6 +130,7 @@ extern int allocate_device_memory(cudamat* mat) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int allocate_device_memory_sparse(cudamat_sparse* mat) {
     int nnz = mat->nnz, rows = mat->size[0];
 
@@ -149,7 +158,7 @@ extern int allocate_device_memory_sparse(cudamat_sparse* mat) {
     return 0;
 }
 
-
+__declspec(dllexport)
 extern int copy_to_host(cudamat* mat) {
     int len = mat->size[0]*mat->size[1];
 
@@ -164,6 +173,7 @@ extern int copy_to_host(cudamat* mat) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int copy_to_device(cudamat* mat) {
     int len = mat->size[0]*mat->size[1];
     int err_code = 0;
@@ -185,6 +195,7 @@ extern int copy_to_device(cudamat* mat) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int copy_sparse_to_device(cudamat_sparse* mat) {
     int len = mat->nnz, rows = mat->size[0];
     int err_code = 0;
@@ -213,7 +224,7 @@ extern int copy_sparse_to_device(cudamat_sparse* mat) {
     return 0;
 }
 
-
+__declspec(dllexport)
 extern int copy_on_device(cudamat* mat1, cudamat* mat2) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -228,6 +239,7 @@ extern int copy_on_device(cudamat* mat1, cudamat* mat2) {
         return 0;
 }
 
+__declspec(dllexport)
 extern int get_row_slice(cudamat* source, cudamat* target, unsigned int start, unsigned int end) {
     int height = source->size[0];
     int width = source->size[1];
@@ -248,6 +260,7 @@ extern int get_row_slice(cudamat* source, cudamat* target, unsigned int start, u
         return 0;
 }
 
+__declspec(dllexport)
 extern int set_row_slice(cudamat* source, cudamat* target, unsigned int start, unsigned int end) {
     int height = target->size[0];
     int width = target->size[1];
@@ -268,6 +281,7 @@ extern int set_row_slice(cudamat* source, cudamat* target, unsigned int start, u
         return 0;
 }
 
+__declspec(dllexport)
 extern int copy_transpose(cudamat* source, cudamat* target) {
     unsigned int height = source->size[0];
     unsigned int width = source->size[1];
@@ -295,6 +309,7 @@ extern int copy_transpose(cudamat* source, cudamat* target) {
         return 0;
 }
 
+__declspec(dllexport)
 extern int free_device_memory(cudamat* mat) {
     if (mat->owns_data && mat->on_device) {
         cublasStatus stat;
@@ -309,6 +324,7 @@ extern int free_device_memory(cudamat* mat) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int set_shape(cudamat* mat, unsigned int m, unsigned int n) {
 
     mat->size[0] = m;
@@ -318,6 +334,7 @@ extern int set_shape(cudamat* mat, unsigned int m, unsigned int n) {
 }
 
 
+__declspec(dllexport)
 extern int reshape(cudamat* mat, unsigned int m, unsigned int n) {
     if (mat->size[0] * mat->size[1] != m * n)
         return ERROR_INCOMPATIBLE_DIMENSIONS;
@@ -328,6 +345,8 @@ extern int reshape(cudamat* mat, unsigned int m, unsigned int n) {
     return 0;
 }
 
+
+__declspec(dllexport)
 extern int get_slice(cudamat* source, cudamat* target, unsigned int first_col, unsigned int last_col) {
     if (source->is_trans)
         return ERROR_TRANSPOSED;
@@ -352,6 +371,8 @@ extern int get_slice(cudamat* source, cudamat* target, unsigned int first_col, u
     return 0;
 }
 
+
+__declspec(dllexport)
 extern int get_vector_slice(cudamat* source, cudamat* target, unsigned int first_ind, unsigned int last_ind) {
     // source must be a vector.
     if (source->size[0] > 1 && source->size[1] > 1)
@@ -394,6 +415,7 @@ extern int get_vector_slice(cudamat* source, cudamat* target, unsigned int first
 
 /* ------------------------------ Initialization routines ------------------------------ */
 
+__declspec(dllexport)
 extern void init_from_array(cudamat* mat, float* data, int m, int n) {
     mat->data_host = data;
     mat->size[0] = m;
@@ -404,6 +426,7 @@ extern void init_from_array(cudamat* mat, float* data, int m, int n) {
     mat->owns_data = 1;
 }
 
+__declspec(dllexport)
 extern void init_from_sparse_array(cudamat_sparse* mat, float* data, int* indices, int* indptr, int m, int n, int nnz) {
     mat->data_host.data = data;
     mat->data_host.indices = indices;
@@ -417,11 +440,12 @@ extern void init_from_sparse_array(cudamat_sparse* mat, float* data, int* indice
     mat->nnz = nnz;
 }
 
-
+__declspec(dllexport)
 extern void set_on_device(cudamat* mat) {
   mat->on_device = 1;
 }
 
+__declspec(dllexport)
 extern int init_empty(cudamat* mat, int m, int n) {
     mat->size[0] = m;
     mat->size[1] = n;
@@ -434,6 +458,7 @@ extern int init_empty(cudamat* mat, int m, int n) {
 }
 
 /* ------------------------------ Random number generation ------------------------------ */
+__declspec(dllexport)
 extern int fill_with_rand(rnd_struct* rnd_state, cudamat* mat) {
     int len = mat->size[0] * mat->size[1];
 
@@ -450,6 +475,7 @@ extern int fill_with_rand(rnd_struct* rnd_state, cudamat* mat) {
         return 0;
 }
 
+__declspec(dllexport)
 extern int fill_with_randn(rnd_struct* rnd_state, cudamat* mat) {
     int len = mat->size[0] * mat->size[1];
 
@@ -466,6 +492,7 @@ extern int fill_with_randn(rnd_struct* rnd_state, cudamat* mat) {
         return 0;
 }
 
+__declspec(dllexport)
 extern int sample_bernoulli(rnd_struct* rnd_state, cudamat* mat, cudamat* target) {
     int len = mat->size[0] * mat->size[1];
     if (mat->size[0] != target->size[0] || mat->size[1] != target->size[1])
@@ -483,6 +510,8 @@ extern int sample_bernoulli(rnd_struct* rnd_state, cudamat* mat, cudamat* target
     else
         return 0;
 }
+
+__declspec(dllexport)
 extern int sample_bernoulli_tanh(rnd_struct* rnd_state, cudamat* mat, cudamat* target) {
     int len = mat->size[0] * mat->size[1];
     if (mat->size[0] != target->size[0] || mat->size[1] != target->size[1])
@@ -500,6 +529,8 @@ extern int sample_bernoulli_tanh(rnd_struct* rnd_state, cudamat* mat, cudamat* t
     else
         return 0;
 }
+
+__declspec(dllexport)
 extern int sample_poisson(rnd_struct* rnd_state, cudamat* mat, cudamat* target) {
     int len = mat->size[0] * mat->size[1];
     if (mat->size[0] != target->size[0] || mat->size[1] != target->size[1])
@@ -517,6 +548,8 @@ extern int sample_poisson(rnd_struct* rnd_state, cudamat* mat, cudamat* target) 
     else
         return 0;
 }
+
+__declspec(dllexport)
 extern int sample_gaussian(rnd_struct* rnd_state, cudamat* mat, cudamat* target, float mult) {
     int len = mat->size[0] * mat->size[1];
     if (mat->size[0] != target->size[0] || mat->size[1] != target->size[1])
@@ -535,6 +568,7 @@ extern int sample_gaussian(rnd_struct* rnd_state, cudamat* mat, cudamat* target,
         return 0;
 }
 
+__declspec(dllexport)
 extern int perturb_energy(rnd_struct* rnd_state, cudamat* mat, cudamat* target) {
     int len = mat->size[0] * mat->size[1];
     if (mat->size[0] != target->size[0] || mat->size[1] != target->size[1])
@@ -553,6 +587,7 @@ extern int perturb_energy(rnd_struct* rnd_state, cudamat* mat, cudamat* target) 
         return 0;
 }
 
+__declspec(dllexport)
 extern int perturb_prob(rnd_struct* rnd_state, cudamat* mat, cudamat* target) {
     int len = mat->size[0] * mat->size[1];
     if (mat->size[0] != target->size[0] || mat->size[1] != target->size[1])
@@ -571,6 +606,7 @@ extern int perturb_prob(rnd_struct* rnd_state, cudamat* mat, cudamat* target) {
         return 0;
 }
 
+__declspec(dllexport)
 extern int dropout(rnd_struct* rnd_state, cudamat* mat, float dropprob, float val) {
     int len = mat->size[0] * mat->size[1];
 
@@ -589,6 +625,7 @@ extern int dropout(rnd_struct* rnd_state, cudamat* mat, float dropprob, float va
 
 /* ------------------------------ Algebraic operations ------------------------------ */
 
+__declspec(dllexport)
 extern int add_col_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -614,6 +651,7 @@ extern int add_col_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int add_col_mult(cudamat* mat, cudamat* vec, cudamat* target, float mult) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -638,6 +676,7 @@ extern int add_col_mult(cudamat* mat, cudamat* vec, cudamat* target, float mult)
     return 0;
 }
 
+__declspec(dllexport)
 extern int mult_diagonal_scalar(cudamat* mat, float val, cudamat* target) {
     unsigned int w = mat->size[1];
 
@@ -661,6 +700,7 @@ extern int mult_diagonal_scalar(cudamat* mat, float val, cudamat* target) {
 }
 
 
+__declspec(dllexport)
 extern int add_diagonal_scalar(cudamat* mat, float val, cudamat* target) {
     unsigned int w = mat->size[1];
 
@@ -683,7 +723,7 @@ extern int add_diagonal_scalar(cudamat* mat, float val, cudamat* target) {
     return 0;
 }
 
-
+__declspec(dllexport)
 extern int mult_diagonal(cudamat* mat, cudamat* vec, cudamat* target) {
     unsigned int w = mat->size[1];
 
@@ -707,7 +747,7 @@ extern int mult_diagonal(cudamat* mat, cudamat* vec, cudamat* target) {
     return 0;
 }
 
-
+__declspec(dllexport)
 extern int add_diagonal(cudamat* mat, cudamat* vec, cudamat* target) {
     unsigned int w = mat->size[1];
 
@@ -731,7 +771,7 @@ extern int add_diagonal(cudamat* mat, cudamat* vec, cudamat* target) {
     return 0;
 }
 
-
+__declspec(dllexport)
 extern int add_row_mult(cudamat* mat, cudamat* vec, cudamat* target, float mult) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -756,6 +796,7 @@ extern int add_row_mult(cudamat* mat, cudamat* vec, cudamat* target, float mult)
     return 0;
 }
 
+__declspec(dllexport)
 extern int add_row_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -780,6 +821,7 @@ extern int add_row_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int mult_by_col_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -804,6 +846,7 @@ extern int mult_by_col_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int mult_by_row_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -828,6 +871,7 @@ extern int mult_by_row_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int div_by_col_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -852,6 +896,7 @@ extern int div_by_col_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int div_by_row_vec(cudamat* mat, cudamat* vec, cudamat* target) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -875,6 +920,8 @@ extern int div_by_row_vec(cudamat* mat, cudamat* vec, cudamat* target) {
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int less_than_eq(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -898,6 +945,7 @@ extern int less_than_eq(cudamat* mat1, cudamat* mat2, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int less_than(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -920,6 +968,8 @@ extern int less_than(cudamat* mat1, cudamat* mat2, cudamat* target) {
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int less_than_eq_scalar(cudamat* mat, float val, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
@@ -943,6 +993,7 @@ extern int less_than_eq_scalar(cudamat* mat, float val, cudamat* target) {
 }
 
 
+__declspec(dllexport)
 extern int less_than_scalar(cudamat* mat, float val, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
@@ -965,6 +1016,7 @@ extern int less_than_scalar(cudamat* mat, float val, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int greater_than_eq(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -988,6 +1040,7 @@ extern int greater_than_eq(cudamat* mat1, cudamat* mat2, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int greater_than(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -1011,6 +1064,7 @@ extern int greater_than(cudamat* mat1, cudamat* mat2, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int upper_bound(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -1034,7 +1088,7 @@ extern int upper_bound(cudamat* mat1, cudamat* mat2, cudamat* target) {
     return 0;
 }
 
-
+__declspec(dllexport)
 extern int lower_bound(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -1057,6 +1111,8 @@ extern int lower_bound(cudamat* mat1, cudamat* mat2, cudamat* target) {
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int greater_than_eq_scalar(cudamat* mat, float val, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
@@ -1079,6 +1135,7 @@ extern int greater_than_eq_scalar(cudamat* mat, float val, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int greater_than_scalar(cudamat* mat, float val, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
@@ -1100,6 +1157,8 @@ extern int greater_than_scalar(cudamat* mat, float val, cudamat* target) {
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int upper_bound_scalar(cudamat* mat, float val, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
@@ -1122,7 +1181,7 @@ extern int upper_bound_scalar(cudamat* mat, float val, cudamat* target) {
     return 0;
 }
 
-
+__declspec(dllexport)
 extern int lower_bound_scalar(cudamat* mat, float val, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
@@ -1145,6 +1204,7 @@ extern int lower_bound_scalar(cudamat* mat, float val, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int max_by_axis(cudamat* mat, cudamat* target, int axis) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -1175,6 +1235,7 @@ extern int max_by_axis(cudamat* mat, cudamat* target, int axis) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int choose_max_and_accumulate(cudamat* mat, cudamat* acc) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -1200,6 +1261,8 @@ extern int choose_max_and_accumulate(cudamat* mat, cudamat* acc) {
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int choose_max_by_axis(cudamat* mat, cudamat* target, int axis) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -1229,6 +1292,8 @@ extern int choose_max_by_axis(cudamat* mat, cudamat* target, int axis) {
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int argmax_by_axis(cudamat* mat, cudamat* target, int axis) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -1257,6 +1322,8 @@ extern int argmax_by_axis(cudamat* mat, cudamat* target, int axis) {
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int sqsum_by_axis(cudamat* mat, cudamat* target, int axis, float mult, float p) {
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -1286,6 +1353,7 @@ extern int sqsum_by_axis(cudamat* mat, cudamat* target, int axis, float mult, fl
     return 0;
 }
 
+__declspec(dllexport)
 extern int normlimit_by_axis(cudamat* mat, cudamat* target, int axis,
                                    float norm) {
     unsigned int h = mat->size[0],
@@ -1314,7 +1382,7 @@ extern int normlimit_by_axis(cudamat* mat, cudamat* target, int axis,
     return 0;
 }
 
-
+__declspec(dllexport)
 extern int sign(cudamat* mat, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
@@ -1336,6 +1404,8 @@ extern int sign(cudamat* mat, cudamat* target) {
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int apply_cos(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1354,6 +1424,8 @@ extern int apply_cos(cudamat* mat, cudamat* target) {
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int apply_sin(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1373,6 +1445,7 @@ extern int apply_sin(cudamat* mat, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int apply_sigmoid(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1392,6 +1465,7 @@ extern int apply_sigmoid(cudamat* mat, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int apply_tanh(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1411,6 +1485,7 @@ extern int apply_tanh(cudamat* mat, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int apply_abs(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1430,6 +1505,7 @@ extern int apply_abs(cudamat* mat, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int apply_log_1_plus_exp(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1449,6 +1525,7 @@ extern int apply_log_1_plus_exp(cudamat* mat, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int apply_log(cudamat* mat, cudamat* target, float tiny) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1468,6 +1545,7 @@ extern int apply_log(cudamat* mat, cudamat* target, float tiny) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int apply_exp(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1486,6 +1564,8 @@ extern int apply_exp(cudamat* mat, cudamat* target) {
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int apply_ceil(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1504,6 +1584,8 @@ extern int apply_ceil(cudamat* mat, cudamat* target) {
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int apply_floor(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1524,7 +1606,7 @@ extern int apply_floor(cudamat* mat, cudamat* target) {
 }
 
 
-
+__declspec(dllexport)
 extern int apply_sqrt(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1544,6 +1626,7 @@ extern int apply_sqrt(cudamat* mat, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int apply_pow(cudamat* mat, float pow, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1563,6 +1646,7 @@ extern int apply_pow(cudamat* mat, float pow, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int apply_pow_matrix(cudamat* mat, cudamat* pow, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1585,6 +1669,7 @@ extern int apply_pow_matrix(cudamat* mat, cudamat* pow, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int compute_cross_entropy(cudamat* mat, cudamat* pow, cudamat* target, float tiny) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1606,6 +1691,8 @@ extern int compute_cross_entropy(cudamat* mat, cudamat* pow, cudamat* target, fl
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int compute_cross_entropy_bernoulli(cudamat* mat, cudamat* pow, cudamat* target, float tiny) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1627,6 +1714,8 @@ extern int compute_cross_entropy_bernoulli(cudamat* mat, cudamat* pow, cudamat* 
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int correct_preds(cudamat* mat, cudamat* pow, cudamat* target, float cutoff) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1649,6 +1738,7 @@ extern int correct_preds(cudamat* mat, cudamat* pow, cudamat* target, float cuto
     return 0;
 }
 
+__declspec(dllexport)
 extern int reciprocal(cudamat* mat, cudamat* target) {
     unsigned int len = mat->size[0] * mat->size[1];
 
@@ -1668,6 +1758,7 @@ extern int reciprocal(cudamat* mat, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int dot(cudamat* mat1, cudamat* mat2, cudamat* target, float beta, float alpha) {
     if (!mat1->on_device || !mat2->on_device || !target->on_device)
         return ERROR_NOT_ON_DEVICE;
@@ -1695,6 +1786,7 @@ extern int dot(cudamat* mat1, cudamat* mat2, cudamat* target, float beta, float 
     return 0;
 }
 
+__declspec(dllexport)
 extern int sparse_dot(cudamat_sparse* mat1, cudamat* mat2, cudamat* target, float beta, float alpha) {
     if (!mat1->on_device || !mat2->on_device || !target->on_device)
         return ERROR_NOT_ON_DEVICE;
@@ -1730,6 +1822,7 @@ extern int sparse_dot(cudamat_sparse* mat1, cudamat* mat2, cudamat* target, floa
 }
 
 
+__declspec(dllexport)
 extern float vdot(cudamat* mat1, cudamat* mat2, int* err_code) {
     int len = mat1->size[0]*mat1->size[1];
     float res;
@@ -1760,6 +1853,7 @@ extern float vdot(cudamat* mat1, cudamat* mat2, int* err_code) {
 
 /* Perform the operation mat1 = mat1 + alpha * mat2. mat1 and mat2 must
    have the same transposedness. */
+__declspec(dllexport)
 extern int add_mult(cudamat* mat1, cudamat* mat2, float alpha) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -1779,6 +1873,8 @@ extern int add_mult(cudamat* mat1, cudamat* mat2, float alpha) {
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int add_mult_sign(cudamat* mat1, cudamat* mat2, float mult) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -1799,7 +1895,7 @@ extern int add_mult_sign(cudamat* mat1, cudamat* mat2, float mult) {
     return 0;
 }
 
-
+__declspec(dllexport)
 extern int add_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -1823,6 +1919,7 @@ extern int add_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int subtract_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -1846,6 +1943,7 @@ extern int subtract_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int divide_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -1870,6 +1968,7 @@ extern int divide_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
 }
 
 /* Elementwise multiplication of 2 matrices */
+__declspec(dllexport)
 extern int mult_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -1893,6 +1992,7 @@ extern int mult_elementwise(cudamat* mat1, cudamat* mat2, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int apply_sin_deriv(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -1915,6 +2015,8 @@ extern int apply_sin_deriv(cudamat* mat1, cudamat* mat2, cudamat* target) {
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int apply_cos_deriv(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -1937,6 +2039,8 @@ extern int apply_cos_deriv(cudamat* mat1, cudamat* mat2, cudamat* target) {
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int apply_logistic_deriv(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -1960,6 +2064,7 @@ extern int apply_logistic_deriv(cudamat* mat1, cudamat* mat2, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int apply_tanh_deriv(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -1983,6 +2088,7 @@ extern int apply_tanh_deriv(cudamat* mat1, cudamat* mat2, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int apply_rectified_linear_deriv(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -2006,6 +2112,7 @@ extern int apply_rectified_linear_deriv(cudamat* mat1, cudamat* mat2, cudamat* t
     return 0;
 }
 
+__declspec(dllexport)
 extern int apply_rectified_linear_smooth_deriv(cudamat* mat1, cudamat* mat2, cudamat* target) {
     int len = mat1->size[0]*mat1->size[1];
 
@@ -2028,6 +2135,8 @@ extern int apply_rectified_linear_smooth_deriv(cudamat* mat1, cudamat* mat2, cud
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int assign_scalar(cudamat* mat, float alpha) {
     int len = mat->size[0]*mat->size[1];
 
@@ -2044,6 +2153,7 @@ extern int assign_scalar(cudamat* mat, float alpha) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int mult_by_scalar(cudamat* mat, float alpha, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
@@ -2063,6 +2173,7 @@ extern int mult_by_scalar(cudamat* mat, float alpha, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int divide_by_scalar(cudamat* mat, float alpha, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
@@ -2082,6 +2193,7 @@ extern int divide_by_scalar(cudamat* mat, float alpha, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int add_scalar(cudamat* mat, float alpha, cudamat* target) {
     int len = mat->size[0]*mat->size[1];
 
@@ -2101,6 +2213,7 @@ extern int add_scalar(cudamat* mat, float alpha, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern float euclid_norm(cudamat* mat, int* err_code) {
     int len = mat->size[0]*mat->size[1];
 
@@ -2117,6 +2230,8 @@ extern float euclid_norm(cudamat* mat, int* err_code) {
         return res;
     }
 }
+
+__declspec(dllexport)
 extern int selectRows(cudamat* source, cudamat* target, cudamat* indices){
     const int nRetRows = indices->size[1];
 
@@ -2134,7 +2249,7 @@ extern int selectRows(cudamat* source, cudamat* target, cudamat* indices){
         return 0;
 }
 
-
+__declspec(dllexport)
 extern int swapColumns(cudamat* source, cudamat* target, cudamat* indices1, cudamat* indices2){
     const int cols = indices1->size[1]*indices1->size[0],
                  h = source->size[0],
@@ -2149,6 +2264,7 @@ extern int swapColumns(cudamat* source, cudamat* target, cudamat* indices1, cuda
         return 0;
 }
 
+__declspec(dllexport)
 extern int setSelectedRows(cudamat* target, cudamat* source, cudamat* indices){
     const int nSetRows = indices->size[1];
 
@@ -2167,6 +2283,7 @@ extern int setSelectedRows(cudamat* target, cudamat* source, cudamat* indices){
         return 0;
 }
 
+__declspec(dllexport)
 extern int generate_translations_big_var_off(cudamat* source, cudamat* target, cudamat* off_x, cudamat* off_y, int source_w, int target_w, int num_channels) {
     dim3 kernelBlockGrid(source->size[1], 1, 1);
     dim3 kernelBlockDim(512, 1, 1);
@@ -2179,6 +2296,7 @@ extern int generate_translations_big_var_off(cudamat* source, cudamat* target, c
     return 0;
 }
 
+__declspec(dllexport)
 extern int blockify(cudamat* source, cudamat* target, int blocksize) {
     dim3 kernelBlockGrid(source->size[1], 1, 1);
     dim3 kernelBlockDim(512, 1, 1);
@@ -2188,7 +2306,7 @@ extern int blockify(cudamat* source, cudamat* target, int blocksize) {
     return 0;
 }
 
-
+__declspec(dllexport)
 extern int softmax(cudamat* mat, cudamat* target) { 
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -2217,6 +2335,7 @@ extern int softmax(cudamat* mat, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int softmax_overwrite(cudamat* mat) { 
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -2240,6 +2359,8 @@ extern int softmax_overwrite(cudamat* mat) {
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int apply_softmax_grad(cudamat* mat, cudamat* labels, cudamat* target) { 
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -2264,6 +2385,8 @@ extern int apply_softmax_grad(cudamat* mat, cudamat* labels, cudamat* target) {
 
     return 0;
 }
+
+__declspec(dllexport)
 extern int get_softmax_correct(cudamat* mat, cudamat* labels, cudamat* target) { 
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -2292,6 +2415,7 @@ extern int get_softmax_correct(cudamat* mat, cudamat* labels, cudamat* target) {
     return 0;
 }
 
+__declspec(dllexport)
 extern int accumulate_columns(cudamat* mat, cudamat* indices, cudamat* target, float mult, int avg) { 
     unsigned int h = mat->size[0],
                  w = mat->size[1],
@@ -2320,6 +2444,7 @@ extern int accumulate_columns(cudamat* mat, cudamat* indices, cudamat* target, f
     return 0;
 }
 
+__declspec(dllexport)
 extern int get_softmax_cross_entropy(cudamat* mat, cudamat* labels, cudamat* target, float tiny) { 
     unsigned int h = mat->size[0],
                  w = mat->size[1];
@@ -2345,6 +2470,7 @@ extern int get_softmax_cross_entropy(cudamat* mat, cudamat* labels, cudamat* tar
     return 0;
 }
 
+__declspec(dllexport)
 extern int expand(cudamat* source, cudamat* indices, cudamat* target){
     unsigned int h = source->size[0],
                  w = source->size[1],
@@ -2371,6 +2497,7 @@ extern int expand(cudamat* source, cudamat* indices, cudamat* target){
 }
 
 
+__declspec(dllexport)
 extern int expand_and_add(cudamat* source, cudamat* mat, cudamat* indices, cudamat* target, float mult){
     unsigned int h = source->size[0],
                  w = source->size[1],

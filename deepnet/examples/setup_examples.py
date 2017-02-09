@@ -37,8 +37,10 @@ def MakeModels(model_file, output_path):
   util.WritePbtxt(model_file, model)
 
 def main():
-  data_path = os.path.abspath(sys.argv[1])  # Path to mnist data directory.
-  output_path = os.path.abspath(sys.argv[2])  # Path where learned models will be written.
+  args = [r"C:\IMR\model\deepnet\mnist", r"C:\IMR\model\deepnet\temp"]
+
+  data_path = os.path.abspath(args[0])  # Path to mnist data directory.
+  output_path = os.path.abspath(args[1])  # Path where learned models will be written.
 
   data_pbtxt_file = os.path.join(data_path, 'mnist.pbtxt')
   MakeDataPbtxt(data_pbtxt_file, data_path)

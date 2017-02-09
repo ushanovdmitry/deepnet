@@ -349,8 +349,8 @@ def test_add_sums():
     mt1.copy_to_host()
     mt2.copy_to_host()
 
-    assert np.max(np.abs(c1 - mt1.numpy_array)) < 10**-3, "Error in CUDAMatrix.add_sums exceeded threshold"
-    assert np.max(np.abs(c2 - mt2.numpy_array)) < 10**-3, "Error in CUDAMatrix.add_sums exceeded threshold"
+    assert np.max(np.abs(c1 - mt1.numpy_array)) < 10**-3, "Error in CUDAMatrix.add_sums exceeded threshold, %f" % np.max(np.abs(c1 - mt1.numpy_array))
+    assert np.max(np.abs(c2 - mt2.numpy_array)) < 10**-3, "Error in CUDAMatrix.add_sums exceeded threshold, %f" % np.max(np.abs(c2 - mt2.numpy_array))
 
 
 def test_less_than():
@@ -820,7 +820,7 @@ def test_dot_trans():
 
     m1 = cm.CUDAMatrix(a)
     m2 = cm.CUDAMatrix(b)
-    m1.set_trans(True);
+    m1.set_trans(True)
     m3 = cm.dot(m1, m2)
     m3.copy_to_host()
 
@@ -924,4 +924,53 @@ def test_select_columns():
     assert np.max(np.abs(res - t_d.asarray())) < 10**-4, "Error in CUDAMatrix.select_columns exceeded threshold"
 
 if __name__ == '__main__':
-    nose.run()
+    # nose.run()
+    setup()
+
+    test_reshape()
+    test_T_field()
+    test_assign()
+    test_assign_scalar()
+    test_get_row_slice()
+    test_set_row_slice()
+    test_transpose()
+    test_slice()
+    test_add_col_vec()
+    test_add_col_mult()
+    test_add_row_vec()
+    test_mult_by_col()
+    test_mult_by_row()
+    test_sum()
+    test_sum_trans()
+    test_add_sums()
+    test_less_than()
+    test_greater_than()
+    test_max()
+    test_max2()
+    test_sign()
+    test_sigmoid()
+    test_log()
+    test_exp()
+    test_sqrt()
+    test_pow()
+    test_pow_matrix()
+    test_reciprocal()
+    test_add_mult()
+    test_subtract_mult()
+    test_add()
+    test_subtract()
+    test_divide()
+    test_mult()
+    test_scalar_mult()
+    test_scalar_div()
+    test_add_scalar()
+    test_dot()
+    test_dot_trans()
+    test_add_dot()
+    test_vdot()
+    test_subtract_dot()
+    test_random()
+    test_euclid_norm()
+    test_select_columns()
+
+    teardown()

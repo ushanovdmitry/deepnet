@@ -7,23 +7,11 @@ from choose_matrix_library import *
 import numpy as np
 from time import sleep
 
-def LockGPU(max_retries=10):
-  for retry_count in range(max_retries):
-    board = gpu_lock.obtain_lock_id()
-    if board != -1:
-      break
-    sleep(1)
-  if board == -1:
-    print 'No GPU board available.'
-    sys.exit(1)
-  else:
-    cm.cuda_set_device(board)
-    cm.cublas_init()
-  return board
+def LockGPU():
+  cm.cublas_init()
 
-def FreeGPU(board):
+def FreeGPU():
   cm.cublas_shutdown()
-  #gpu_lock.free_lock(board)
 
 def LoadExperiment(model_file, train_op_file, eval_op_file):
   model = util.ReadModel(model_file)
@@ -45,16 +33,23 @@ def CreateDeepnet(model, train_op, eval_op):
   else:
     raise Exception('Model not implemented.')
 
-def main():
-  if use_gpu == 'yes':
-    board = LockGPU()
-  model, train_op, eval_op = LoadExperiment(sys.argv[1], sys.argv[2],
-                                            sys.argv[3])
-  model = CreateDeepnet(model, train_op, eval_op)
-  model.Train()
-  if use_gpu == 'yes':
-    FreeGPU(board)
-  #raw_input('Press Enter.')
+# if __name__ == '__main__':
 
-if __name__ == '__main__':
-  main()
+LockGPU()
+
+folder = r'examples\ff'
+files = 'model_dropout train eval'.split(' ')
+args = [folder + '\\' + _ + '.pbtxt' for _ in files]
+
+model, train_op, eval_op = LoadExperiment(*args)
+
+model = CreateDeepnet(model, train_op, eval_op)
+
+model.Train()
+
+model.edge[0].hyperparams.enable_display = True
+model.edge[0].Show()
+plt.show()
+
+# FreeGPU()
+

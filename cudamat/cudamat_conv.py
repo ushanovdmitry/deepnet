@@ -1,7 +1,8 @@
 import ctypes as ct
 import math
-import pdb
-_ConvNet = ct.cdll.LoadLibrary('libcudamat_conv.so')
+import os
+
+_ConvNet = ct.cdll.LoadLibrary(os.path.dirname(os.path.realpath(__file__)) + '/libcudamat_conv.dll')
 
 def convUp(images, filters, targets, numModulesX, paddingStart, moduleStride, numImgColors, numGroups=1):
   """

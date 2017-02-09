@@ -17,7 +17,7 @@ def get_plot(v, skip, label):
 
 
 if __name__ == '__main__':
-  plt.ion()
+  # plt.ion()
   proto = sys.argv[1]
   proto = glob.glob(proto + "*")[-1]
   print proto

@@ -1,7 +1,7 @@
 """Implements a layer of neurons."""
 from parameter import *
 import matplotlib.pyplot as plt
-plt.ion()
+# plt.ion()
 class Layer(Parameter):
 
   def __init__(self, proto, t_op=None, tied_to=None):
