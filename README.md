@@ -12,6 +12,6 @@ GPU-based python implementation of
 5.  Deep Boltzmann Machines
 6.  Convolutional Neural Nets
 
-Built on top of the [cudamat](http://code.google.com/p/cudamat/) library by
+Built on top of the [cudamat](https://github.com/cudamat/cudamat) library by
 Vlad Mnih and [cuda-convnet](http://code.google.com/p/cuda-convnet/) library by
 Alex Krizhevsky.

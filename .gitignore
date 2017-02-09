@@ -6,11 +6,10 @@
 
 .idea
 
-eigenmat
 temp
 include
 mnist
 protoc.exe
-temp.txt
+temp.*
 
 

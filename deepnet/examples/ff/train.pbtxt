@@ -11,3 +11,5 @@ checkpoint_after: 10000000
 checkpoint_directory: "C:\\IMR\\model\\deepnet\\temp"
 randomize: true
 show_after: 500
+
+verbose: true

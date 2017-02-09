@@ -567,8 +567,8 @@ class NeuralNet(object):
   def SetUpTrainer(self):
     """Load the model, setup the data, set the stopping conditions."""
     self.LoadModelOnGPU()
-    # if self.verbose:
-    self.PrintNetwork()
+    if self.verbose:
+      self.PrintNetwork()
     self.SetUpData()
     if self.t_op.stopcondition.all_processed:
       num_steps = self.train_data_handler.num_batches
