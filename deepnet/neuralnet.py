@@ -46,7 +46,7 @@ class NeuralNet(object):
             Load the model on the GPU.
         """
 
-        for layer in self.net.layer:
+        for layer in self.net_opts.layer:
             # layer.hyperparams.MergeFrom(LoadMissing(layer.hyperparams,
             #                                         self.net.hyperparams))
 
@@ -61,18 +61,14 @@ class NeuralNet(object):
             self.layer.append(create_layer(layer.hyperparams.activation,
                                            layer, self.t_op, tied_to=tied_to))
 
-        for edge in self.net.edge:
-            hyp = deepnet_pb2.Hyperparams()
-            hyp.CopyFrom(self.net.hyperparams)
-            hyp.MergeFrom(edge.hyperparams)
-            edge.hyperparams.MergeFrom(hyp)
+        for edge in self.net_opts.edge:
             try:
                 node1 = next(layer for layer in self.layer if layer.name == edge.node1)
             except StopIteration:
                 print edge.node1, [l.name for l in self.layer]
             node2 = next(layer for layer in self.layer if layer.name == edge.node2)
             if not edge.prefix:
-                edge.prefix = self.net.prefix
+                edge.prefix = self.net_opts.prefix
             tied_to = None
             if edge.tied:
                 tied_to = next(e for e in self.edge if e.node1.name == edge.tied_to_node1 and e.node2.name == edge.tied_to_node2)

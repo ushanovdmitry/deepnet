@@ -40,13 +40,13 @@ class Parameter(object):
         self.params[param.name] = cm.CUDAMatrix(mat)
 
   def InitializeParameter(self, param):
-    if param.initialization == deepnet_pb2.Parameter.CONSTANT:
+    if param.initialization == "CONSTANT":
       return np.zeros(tuple(param.dimensions)) + param.constant
-    elif param.initialization == deepnet_pb2.Parameter.DENSE_GAUSSIAN:
+    elif param.initialization == "DENSE_GAUSSIAN":
       return param.sigma * np.random.randn(*tuple(param.dimensions))
-    elif param.initialization == deepnet_pb2.Parameter.DENSE_UNIFORM:
+    elif param.initialization == "DENSE_UNIFORM":
       return param.sigma * (2 * np.random.rand(*tuple(param.dimensions)) - 1)
-    elif param.initialization == deepnet_pb2.Parameter.DENSE_GAUSSIAN_SQRT_FAN_IN:
+    elif param.initialization == "DENSE_GAUSSIAN_SQRT_FAN_IN":
       assert len(param.dimensions) > 1
       if param.conv or param.local:
         fan_in = np.prod(param.dimensions[0])
@@ -54,7 +54,7 @@ class Parameter(object):
         fan_in = np.prod(param.dimensions[1])
       stddev = param.sigma / np.sqrt(fan_in)
       return stddev * np.random.randn(*tuple(param.dimensions))
-    elif param.initialization == deepnet_pb2.Parameter.DENSE_UNIFORM_SQRT_FAN_IN:
+    elif param.initialization == "DENSE_UNIFORM_SQRT_FAN_IN":
       assert len(param.dimensions) > 1
       if param.conv or param.local:
         fan_in = np.prod(param.dimensions[0])
@@ -62,7 +62,7 @@ class Parameter(object):
         fan_in = np.prod(param.dimensions[1])
       stddev = param.sigma / np.sqrt(fan_in)
       return stddev * (2 * np.random.rand(*tuple(param.dimensions)) - 1)
-    elif param.initialization == deepnet_pb2.Parameter.PRETRAINED:
+    elif param.initialization == "PRETRAINED":
       return self.LoadPretrained(param)
     else:
       raise Exception('Unknown parameter initialization.')

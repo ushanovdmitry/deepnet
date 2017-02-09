@@ -225,6 +225,30 @@ class LayerOpts:
         assert len(opts) == 0
 
 
+class EdgeOpts:
+    def __init__(self, opts):
+        assert isinstance(opts, dict)
+
+        self.node1 = opts.pop("node1")  #  required string node1 = 1;
+        self.node2 = opts.pop("node2")  #  required string node2 = 2;
+        self.directed = opts.pop("directed", True)  #  optional bool directed = 3 [default=true];
+        self.param = [ParameterOpts(_) for _ in opts.pop("param", [])]  #  repeated Parameter param = 4;
+        self.hyperparams = HyperparamsOpts(opts.pop("hyperparams", {}))  #  optional Hyperparams hyperparams = 5;
+        self.receptive_field_width = opts.pop("receptiveFieldWidth", 1)  #  optional int32 receptive_field_width = 6 [default=1];
+        self.display_rows = opts.pop("displayRows", 1)  #  optional int32 display_rows = 7 [default=1];
+        self.display_cols = opts.pop("displayCols", 1)  #  optional int32 display_cols = 8 [default=1];
+        self.up_factor = opts.pop("upFactor", 1)  #  optional float up_factor = 9 [default=1];
+        self.down_factor = opts.pop("downFactor", 1)  #  optional float down_factor = 10 [default=1];
+        self.prefix = opts.pop("prefix", "")  #  optional string prefix = 11;
+        self.tied = opts.pop("tied", False)  #  optional bool tied = 12[default=false];
+        self.tied_to_node1 = opts.pop("tied_to_node1", "")  #  optional string tied_to_node1 = 13;
+        self.tied_to_node2 = opts.pop("tied_to_node2", "")  #  optional string tied_to_node2 = 14;
+        self.tied_transpose = opts.pop("tied_transpose", False)  #  optional bool tied_transpose = 15[default=false];
+        self.block_gradient = opts.pop("block_gradient", False)  #  optional bool block_gradient = 16 [default=false];
+
+        assert len(opts) == 0
+
+
 class ModelOpts:
     def __init__(self, opts):
         assert isinstance(opts, dict)
@@ -236,7 +260,7 @@ class ModelOpts:
         print self.layer
         print self
 
-#   repeated deepnet.Edge edge = 4;
+        self.edge =[EdgeOpts(_) for _ in opts.pop("edge", [])]  #  repeated Edge edge = 4;
         self.hyperparams = HyperparamsOpts(opts.pop("hyperparams", {}))  #  optional Hyperparams hyperparams = 5;
         self.train_stats = [MetricsOpts(_) for _ in opts.pop("trainStats", [])]  #  repeated Metrics train_stats = 6;
         self.validation_stats = [MetricsOpts(_) for _ in opts.pop("validationStats", [])]  #  repeated Metrics validation_stats = 7;
@@ -272,5 +296,11 @@ def load_model(net):
             layer["hyperparams"] = {k: v for (k, v) in net["hyperparams"].items()}
 
         load_missing(layer["hyperparams"], net["hyperparams"])
+
+    for edge in net["edge"]:
+        if "hyperparams" not in edge:
+            edge["hyperparams"] = {k: v for (k, v) in net["hyperparams"].items()}
+
+        load_missing(edge["hyperparams"], net["hyperparams"])
 
     return ModelOpts(net)

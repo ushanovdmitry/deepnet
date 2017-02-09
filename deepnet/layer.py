@@ -4,18 +4,22 @@ import numpy as np
 import cudamat as cm
 import parameter
 
+import load_json_helpers
+
 
 class Layer(parameter.Parameter):
     def __init__(self, opts, t_op=None, tied_to=None):
+        assert isinstance(opts, load_json_helpers.LayerOpts)
+
         super(Layer, self).__init__()
         self.tied_to = tied_to
-        if opts.get("tied", False):
+        if opts.tied:
             tied_to.num_shares += 1
             proto = util.LoadMissing(proto, tied_to.proto)
         self.opts = opts
         self.state = None
         self.params = {}
-        self.hyperparams = opts["hyperparams"]
+        self.hyperparams = opts.hyperparams
         self.incoming_edge = []
         self.outgoing_edge = []
         self.outgoing_neighbour = []
@@ -27,14 +31,14 @@ class Layer(parameter.Parameter):
             self.use_suff_stats = t_op["optimizer"] in ["PCD", "CD"]
         else:
             self.batchsize = 0
-        self.name = opts["name"]
-        self.dimensions = opts["dimensions"]
-        self.numlabels = opts.get("numlabels", 1)
-        self.activation = opts["hyperparams"]["activation"]
-        self.is_input = opts["is_input"]
-        self.is_output = opts["is_output"]
-        self.loss_function = opts["loss_function"]
-        self.loss_weight = opts["loss_weight"]
+        self.name = opts.name
+        self.dimensions = opts.dimensions
+        self.numlabels = opts.numlabels
+        self.activation = opts.hyperparams.activation
+        self.is_input = opts.is_input
+        self.is_output = opts.is_output
+        self.loss_function = opts.loss_function
+        self.loss_weight = opts.loss_weight
         self.train_data_handler = None
         self.validation_data_handler = None
         self.test_data_handler = None
@@ -42,26 +46,26 @@ class Layer(parameter.Parameter):
         self.data_tied_to = None
         self.data = None
         self.deriv = None
-        self.prefix = opts.get("prefix", "")
+        self.prefix = opts.prefix
         self.marker = 0
         self.tiny = 1e-10
         self.replicated_neighbour = None
-        self.is_initialized = opts.get("is_initialized", False)
+        self.is_initialized = opts.is_initialized
         self.t_op = t_op
         self.learn_precision = False
-        self.sample_input = self.hyperparams["sample_input"]
-        self.LoadParams(proto, t_op=t_op, tied_to=tied_to)
+        self.sample_input = self.hyperparams.sample_input
+        self.LoadParams(opts, t_op=t_op, tied_to=tied_to)
         if self.batchsize > 0:
             self.AllocateMemory(self.batchsize)
 
-    def LoadParams(self, proto, **kwargs):
-        assert proto
-        for param in proto.param:
+    def LoadParams(self, opts, **kwargs):
+        assert isinstance(opts, load_json_helpers.LayerOpts)
+        for param in opts.param:
             if not param.dimensions:
-                param.dimensions.extend([proto.numlabels * proto.dimensions, 1])
+                param.dimensions.extend([opts.numlabels * opts.dimensions, 1])
             elif len(param.dimensions) == 1:
                 param.dimensions.append(1)
-        super(Layer, self).LoadParams(proto, **kwargs)
+        super(Layer, self).LoadParams(opts, **kwargs)
 
     def LoadPretrained(self, param):
         node_name = param.pretrained_model_node1
@@ -182,14 +186,14 @@ class Layer(parameter.Parameter):
         self.state = cm.CUDAMatrix(np.zeros((numdims, batchsize)))
         self.deriv = cm.CUDAMatrix(np.zeros((numdims, batchsize)))
         if self.t_op:
-            if self.t_op.optimizer == deepnet_pb2.Operation.PCD:
+            if self.t_op["optimizer"] == "PCD":
                 self.pos_state = self.state
                 self.pos_sample = cm.CUDAMatrix(np.zeros((numdims, batchsize)))
                 self.neg_state = cm.CUDAMatrix(np.zeros((numdims, batchsize)))
                 self.neg_sample = cm.CUDAMatrix(np.zeros((numdims, batchsize)))
                 self.sample = self.pos_sample
                 self.suff_stats = cm.empty((numdims, 1))
-            elif self.t_op.optimizer == deepnet_pb2.Operation.CD:
+            elif self.t_op["optimizer"] == "CD":
                 self.sample = cm.CUDAMatrix(np.zeros((numdims, batchsize)))
                 self.suff_stats = cm.empty((numdims, 1))
         else:
