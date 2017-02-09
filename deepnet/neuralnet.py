@@ -7,15 +7,17 @@ from sin_layer import *
 from soft_transfer_edge import *
 from util import *
 
+import load_json_helpers
+
 
 class NeuralNet(object):
-    def __init__(self, net, t_op, e_op):
-        self.net = net
+    def __init__(self, net_opts, t_op, e_op):
+        self.net_opts = load_json_helpers.load_model(net_opts)
         self.t_op = t_op
         self.e_op = e_op
 
-        cm.CUDAMatrix.init_random(self.net["seed"])
-        np.random.seed(self.net["seed"])
+        cm.CUDAMatrix.init_random(self.net_opts.seed)
+        np.random.seed(self.net_opts.seed)
 
         self.data = None
         self.layer = []
@@ -44,18 +46,19 @@ class NeuralNet(object):
             Load the model on the GPU.
         """
 
-        for layer in self.net["layer"]:
+        for layer in self.net.layer:
             # layer.hyperparams.MergeFrom(LoadMissing(layer.hyperparams,
             #                                         self.net.hyperparams))
 
-            util.load_missing(layer["hyperparams"], self.net["hyperparams"]);
+            # util.load_missing(layer["hyperparams"], self.net["hyperparams"])
 
-            if "prefix" not in layer:
-                layer["prefix"] = self.net.get("prefix", "")
+            # if "prefix" not in layer:
+            #     layer["prefix"] = self.net.get("prefix", "")
+
             tied_to = None
-            if layer.get("tied", False):
+            if layer.tied:
                 tied_to = next(l for l in self.layer if l.name == layer.tied_to)
-            self.layer.append(create_layer(layer["hyperparams"]["activation"],
+            self.layer.append(create_layer(layer.hyperparams.activation,
                                            layer, self.t_op, tied_to=tied_to))
 
         for edge in self.net.edge:
