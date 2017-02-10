@@ -18,8 +18,8 @@ class SoftTransferEdge(Edge):
     sw /= sw.sum(axis=1) + 1e-10
     return sw
 
-  def LoadParams(self, proto, **kwargs):
-    super(SoftTransferEdge, self).LoadParams(proto, **kwargs)
+  def load_params(self, proto, **kwargs):
+    super(SoftTransferEdge, self).load_params(proto, **kwargs)
     self.shared_prior_cost = self.hyperparams.shared_prior_cost
 
     if self.hyperparams.shared_prior_file:

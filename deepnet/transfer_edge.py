@@ -5,8 +5,8 @@ class TransferEdge(Edge):
   def IsEdgeType(cls, proto):
     return proto.hyperparams.shared_prior
 
-  def LoadParams(self, proto, **kwargs):
-    super(TransferEdge, self).LoadParams(proto, **kwargs)
+  def load_params(self, proto, **kwargs):
+    super(TransferEdge, self).load_params(proto, **kwargs)
     fname = os.path.join(self.prefix, self.hyperparams.shared_prior_file)
     self.shared_prior_cost = self.hyperparams.shared_prior_cost
     sc = np.load(fname).reshape(1, -1)

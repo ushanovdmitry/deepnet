@@ -4,7 +4,7 @@
     "steps": 5000,
     "allProcessed": false
   }, 
-  "dataProto": "C:\\IMR\\model\\deepnet\\mnist\\mnist.pbtxt", 
+  "dataProto": "C:\\IMR\\model\\deepnet\\mnist\\mnist.json",
   "optimizer": "GRADIENT_DESCENT", 
   "verbose": false,
   "batchsize": 100, 

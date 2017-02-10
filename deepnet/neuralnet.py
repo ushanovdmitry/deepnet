@@ -1,30 +1,22 @@
 """Implements a feed-forward neural net."""
 import sys
 
-# from convolutions import *
-# from datahandler import *
-# from sin_layer import *
-# from soft_transfer_edge import *
-# from util import *
-
-from layer import Layer  # for typehints
-from edge import Edge  # for typehints
-
-import load_json_helpers
-import cudamat as cm
 import numpy as np
 
-from util import create_edge, create_layer
+import cudamat as cm
 from datahandler import GetDataHandles
-
-from util import Accumulate, GetPerformanceStats
+from edge import Edge  # for typehints
+from layer import Layer  # for typehints
+from util import accumulate_performance, performance2str
+from util import create_edge, create_layer
+import util
 
 
 class NeuralNet(object):
     def __init__(self, net_opts, t_op, e_op):
-        self.net_opts = load_json_helpers.load_model(net_opts)
-        self.t_op = load_json_helpers.OperationOpts(t_op)
-        self.e_op = load_json_helpers.OperationOpts(e_op)
+        self.net_opts = util.load_model(net_opts)
+        self.t_op = util.OperationOpts(t_op)
+        self.e_op = util.OperationOpts(e_op)
 
         cm.CUDAMatrix.init_random(self.net_opts.seed)
         np.random.seed(self.net_opts.seed)
@@ -367,7 +359,7 @@ class NeuralNet(object):
 
             if stats:
                 for loss, acc in zip(losses, stats):
-                    Accumulate(acc, loss)
+                    accumulate_performance(acc, loss)
             else:
                 stats = losses
             step += 1
@@ -384,7 +376,7 @@ class NeuralNet(object):
             for m in prec50_list:
                 stat.prec50_list.extend([m])
         for stat in stats:
-            sys.stdout.write(GetPerformanceStats(stat, prefix=prefix))
+            sys.stdout.write(performance2str(stat, prefix=prefix))
         stats_list.extend(stats)
 
 
@@ -480,9 +472,9 @@ class NeuralNet(object):
 
     def CopyModelToCPU(self):
         for layer in self.layer:
-            layer.SaveParameters()
+            layer.save_parameters()
         for edge in self.edge:
-            edge.SaveParameters()
+            edge.save_parameters()
 
     def ResetBatchsize(self, batchsize):
         self.batchsize = batchsize
@@ -617,7 +609,7 @@ class NeuralNet(object):
 
             if stats:
                 for acc, loss in zip(stats, losses):
-                    Accumulate(acc, loss)
+                    accumulate_performance(acc, loss)
             else:
                 stats = losses
             step += 1
@@ -627,7 +619,7 @@ class NeuralNet(object):
                 # Print out training stats.
                 sys.stdout.write('\rStep %d ' % step)
                 for stat in stats:
-                    sys.stdout.write(GetPerformanceStats(stat, prefix='T'))
+                    sys.stdout.write(performance2str(stat, prefix='T'))
                 self.net_opts.train_stats.extend(stats)
                 stats = []
                 # Evaluate on validation set.

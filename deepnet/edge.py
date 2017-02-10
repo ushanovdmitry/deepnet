@@ -1,12 +1,14 @@
 """Implements an edge connecting two layers of neurons."""
-from parameter import *
-import load_json_helpers
+import parameter
+import util
+import cudamat as cm
+import numpy as np
 
 
-class Edge(Parameter):
+class Edge(parameter.Parameter):
     def __init__(self, opts, node1, node2, t_op=None, tied_to=None):
-        assert isinstance(opts, load_json_helpers.EdgeOpts)
-        assert isinstance(t_op, load_json_helpers.OperationOpts)
+        assert isinstance(opts, util.EdgeOpts)
+        assert isinstance(t_op, util.OperationOpts)
 
         super(Edge, self).__init__()
         self.node1 = node1
@@ -41,7 +43,7 @@ class Edge(Parameter):
             node2.AddOutgoingEdge(self)
             node2.AddIncomingEdge(self)
 
-        self.LoadParams(opts, t_op=t_op, tied_to=tied_to)
+        self.load_params(opts, t_op=t_op, tied_to=tied_to)
         self.marker = 0
         if self.conv or self.local:
             self.conv_filter_fig = visualize.GetFigId()
@@ -143,13 +145,13 @@ class Edge(Parameter):
 
         return n_locs
 
-    def LoadParams(self, opts, **kwargs):
+    def load_params(self, opts, **kwargs):
         """Load the parameters for this edge.
 
         Load the parameters if present in self.proto. Otherwise initialize them
         appropriately.
         """
-        assert isinstance(opts, load_json_helpers.EdgeOpts)
+        assert isinstance(opts, util.EdgeOpts)
 
         node1 = self.node1
         node2 = self.node2
@@ -168,7 +170,7 @@ class Edge(Parameter):
                     dims = [node1.numlabels * node1.dimensions,
                             node2.numlabels * node2.dimensions]
                 param.dimensions.extend(dims)
-        super(Edge, self).LoadParams(opts, **kwargs)
+        super(Edge, self).load_params(opts.param, **kwargs)
 
     def LoadPretrained(self, param):
         node1_name = param.pretrained_model_node1

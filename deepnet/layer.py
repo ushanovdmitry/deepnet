@@ -4,14 +4,15 @@ import numpy as np
 import cudamat as cm
 import parameter
 
-import load_json_helpers
 from edge import Edge
+
+import util
 
 
 class Layer(parameter.Parameter):
     def __init__(self, opts, t_op=None, tied_to=None):
-        assert isinstance(opts, load_json_helpers.LayerOpts)
-        assert isinstance(t_op, load_json_helpers.OperationOpts)
+        assert isinstance(opts, util.LayerOpts)
+        assert isinstance(t_op, util.OperationOpts)
 
         super(Layer, self).__init__()
         self.tied_to = tied_to
@@ -56,18 +57,18 @@ class Layer(parameter.Parameter):
         self.t_op = t_op
         self.learn_precision = False
         self.sample_input = self.hyperparams.sample_input
-        self.LoadParams(opts, t_op=t_op, tied_to=tied_to)
+        self.load_params(opts, t_op=t_op, tied_to=tied_to)
         if self.batchsize > 0:
             self.AllocateMemory(self.batchsize)
 
-    def LoadParams(self, opts, **kwargs):
-        assert isinstance(opts, load_json_helpers.LayerOpts)
+    def load_params(self, opts, **kwargs):
+        assert isinstance(opts, util.LayerOpts)
         for param in opts.param:
             if not param.dimensions:
                 param.dimensions.extend([opts.numlabels * opts.dimensions, 1])
             elif len(param.dimensions) == 1:
                 param.dimensions.append(1)
-        super(Layer, self).LoadParams(opts, **kwargs)
+        super(Layer, self).load_params(opts.param, **kwargs)
 
     def LoadPretrained(self, param):
         node_name = param.pretrained_model_node1

@@ -75,3 +75,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # recode_to_json("C:\\IMR\\model\\deepnet\\mnist\\mnist.pbtxt", deepnet_pb2.Dataset())
