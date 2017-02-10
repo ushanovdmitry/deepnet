@@ -203,7 +203,7 @@ class NeuralNet(object):
         # Update the parameters on this layer (i.e., the bias).
         self.UpdateLayerParams(layer, step)
 
-        print 'loss.cross_entropy =', loss.cross_entropy if loss else None
+        print layer.state.sum(), layer.name
         return loss
 
     def AccumulateDeriv(self, layer, edge, deriv):

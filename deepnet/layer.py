@@ -47,7 +47,7 @@ class Layer(parameter.Parameter):
         self.tied_to = None
         self.data_tied_to = None
         self.data = None
-        self.deriv = None
+        self.deriv = None  # type: cm.CUDAMatrix
         self.prefix = opts.prefix
         self.marker = 0
         self.tiny = 1e-10
