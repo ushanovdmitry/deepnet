@@ -304,6 +304,9 @@ class NeuralNet(object):
         losses1 = self.ForwardPropagate(train=True)
         losses2 = self.BackwardPropagate(step)
         losses1.extend(losses2)
+
+        print 'losses1.CE =', ', '.join('%.10f' % _.cross_entropy for _ in losses1)
+
         return losses1
 
     def EvaluateOneBatch(self):
