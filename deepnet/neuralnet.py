@@ -601,12 +601,10 @@ class NeuralNet(object):
 
         dump_best = False
         while not stop:
-            # sys.stdout.write('\rTrain Step: %d' % step)
-            # sys.stdout.flush()
+            sys.stdout.write('\rTrain Step: %d' % step)
+            sys.stdout.flush()
             self.GetTrainBatch()
             losses = self.TrainOneBatch(step)
-
-            print ', '.join('%.10f' % _.cross_entropy for _ in losses)
 
             if stats:
                 for acc, loss in zip(stats, losses):

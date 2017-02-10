@@ -84,13 +84,6 @@ class Parameter(object):
     w_delta = self.gradient_history  # Previous update.
     gradient = self.gradient  # Current gradient.
 
-    print >> util.logfile, 'Parameter.Update:'
-    print >> util.logfile, '\t', param_name, self.name
-    print >> util.logfile, '\t', w.asarray().sum(), w_delta.asarray().sum(), gradient.asarray().sum()
-    print >> util.logfile, '\t', momentum, epsilon
-
-    util.logfile.flush()
-
     # Compute update.
     if h.adapt == "NO_ADAPT":
       w_delta.mult(momentum)
@@ -122,9 +115,9 @@ class Parameter(object):
     h = self.hyperparams
     momentum = h.final_momentum - (h.final_momentum - h.initial_momentum)*np.exp(-float(step)/h.momentum_change_steps)
     epsilon = h.base_epsilon
-    if h.epsilon_decay == deepnet_pb2.Hyperparams.INVERSE_T:
+    if h.epsilon_decay == "INVERSE_T":
       epsilon = h.base_epsilon / (1 + float(step) / h.epsilon_decay_half_life)
-    elif h.epsilon_decay == deepnet_pb2.Hyperparams.EXPONENTIAL:
+    elif h.epsilon_decay == "EXPONENTIAL":
       epsilon = h.base_epsilon / np.power(2, float(step) / h.epsilon_decay_half_life)
     if step < h.start_learning_after:
       epsilon = 0.0
