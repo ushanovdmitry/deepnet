@@ -190,6 +190,10 @@ class MetricsOpts:
 
         assert len(opts) == 0, opts
 
+    def __str__(self):
+        attrs = vars(self)
+        return '\n'.join("%s: %s" % item for item in attrs.items())
+
 
 class LayerOpts:
     def __init__(self, opts):

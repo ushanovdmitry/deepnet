@@ -202,6 +202,8 @@ class NeuralNet(object):
             self.UpdateEdgeParams(edge, layer.deriv, step)
         # Update the parameters on this layer (i.e., the bias).
         self.UpdateLayerParams(layer, step)
+
+        print 'loss.cross_entropy =', loss.cross_entropy if loss else None
         return loss
 
     def AccumulateDeriv(self, layer, edge, deriv):
@@ -599,8 +601,8 @@ class NeuralNet(object):
 
         dump_best = False
         while not stop:
-            sys.stdout.write('\rTrain Step: %d' % step)
-            sys.stdout.flush()
+            # sys.stdout.write('\rTrain Step: %d' % step)
+            # sys.stdout.flush()
             self.GetTrainBatch()
             losses = self.TrainOneBatch(step)
             if stats:

@@ -83,7 +83,7 @@ class SoftmaxLayer(Layer):
     # Restore shapes.
     state.reshape((numlabels * dimensions, batchsize))
     data.reshape((dimensions, batchsize))
-    
+
     return perf
 
   def GetSparsityDivisor(self):
