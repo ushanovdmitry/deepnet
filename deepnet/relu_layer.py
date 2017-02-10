@@ -14,6 +14,9 @@ class ReluLayer(Layer):
     else:
       state = self.state
     state.lower_bound(0)
+    print '#' * 10
+    for k, v in sorted(vars(self).items()):
+        print k, ':', v
 
   def Sample(self, neg=False):
     if neg:
@@ -28,7 +31,6 @@ class ReluLayer(Layer):
   def ComputeDeriv(self):
     """Compute derivative w.r.t input given derivative w.r.t output."""
     self.deriv.apply_rectified_linear_deriv(self.state)
-    print 'relu deriv sum =', self.deriv.sum()
 
   def GetLoss(self, get_deriv=False, acc_deriv=False, **kwargs):
     """Compute loss and also deriv w.r.t to it if asked for.

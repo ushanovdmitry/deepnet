@@ -203,7 +203,6 @@ class NeuralNet(object):
         # Update the parameters on this layer (i.e., the bias).
         self.UpdateLayerParams(layer, step)
 
-        print layer.state.sum(), layer.name
         return loss
 
     def AccumulateDeriv(self, layer, edge, deriv):
@@ -304,8 +303,6 @@ class NeuralNet(object):
         losses1 = self.ForwardPropagate(train=True)
         losses2 = self.BackwardPropagate(step)
         losses1.extend(losses2)
-
-        print 'losses1.CE =', ', '.join('%.10f' % _.cross_entropy for _ in losses1)
 
         return losses1
 
@@ -608,6 +605,9 @@ class NeuralNet(object):
             # sys.stdout.flush()
             self.GetTrainBatch()
             losses = self.TrainOneBatch(step)
+
+            print ', '.join('%.10f' % _.cross_entropy for _ in losses)
+
             if stats:
                 for acc, loss in zip(stats, losses):
                     Accumulate(acc, loss)
