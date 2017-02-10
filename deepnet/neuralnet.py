@@ -326,7 +326,7 @@ class NeuralNet(object):
                 return
             datagetter = self.GetValidationBatch
             prefix = 'V'
-            stats_list = self.net.validation_stats
+            stats_list = self.net_opts.validation_stats
             num_batches = self.validation_data_handler.num_batches
         else:
             stopcondition = self.TestStopCondition
@@ -335,7 +335,7 @@ class NeuralNet(object):
                 return
             datagetter = self.GetTestBatch
             prefix = 'E'
-            stats_list = self.net.test_stats
+            stats_list = self.net_opts.test_stats
             num_batches = self.test_data_handler.num_batches
         if collect_predictions:
             output_layer = self.output_datalayer[0]
@@ -599,8 +599,8 @@ class NeuralNet(object):
 
         dump_best = False
         while not stop:
-            # sys.stdout.write('\rTrain Step: %d' % step)
-            # sys.stdout.flush()
+            sys.stdout.write('\rTrain Step: %d' % step)
+            sys.stdout.flush()
             self.GetTrainBatch()
             losses = self.TrainOneBatch(step)
             if stats:
@@ -616,16 +616,16 @@ class NeuralNet(object):
                 sys.stdout.write('\rStep %d ' % step)
                 for stat in stats:
                     sys.stdout.write(GetPerformanceStats(stat, prefix='T'))
-                self.net.train_stats.extend(stats)
+                self.net_opts.train_stats.extend(stats)
                 stats = []
                 # Evaluate on validation set.
                 self.Evaluate(validation=True, collect_predictions=collect_predictions)
                 # Evaluate on test set.
                 self.Evaluate(validation=False, collect_predictions=collect_predictions)
                 if select_best:
-                    valid_stat = self.net.validation_stats[-1]
-                    if len(self.net.test_stats) > 1:
-                        test_stat = self.net.test_stats[-1]
+                    valid_stat = self.net_opts.validation_stats[-1]
+                    if len(self.net_opts.test_stats) > 1:
+                        test_stat = self.net_opts.test_stats[-1]
                     else:
                         test_stat = valid_stat
                     if select_model_using_error:
@@ -643,9 +643,9 @@ class NeuralNet(object):
                         dump_best = True
                         self.CopyModelToCPU()
                         self.t_op.current_step = step
-                        self.net.best_valid_stat.CopyFrom(valid_stat)
-                        self.net.train_stat_es.CopyFrom(self.net.train_stats[-1])
-                        self.net.test_stat_es.CopyFrom(test_stat)
+                        self.net_opts.best_valid_stat.CopyFrom(valid_stat)
+                        self.net_opts.train_stat_es.CopyFrom(self.net_opts.train_stats[-1])
+                        self.net_opts.test_stat_es.CopyFrom(test_stat)
                         best_net = self.deep_copy()
                         best_t_op = CopyOperation(self.t_op)
                 #for e in self.edge:

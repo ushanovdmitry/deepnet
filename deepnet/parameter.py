@@ -85,7 +85,7 @@ class Parameter(object):
     gradient = self.gradient  # Current gradient.
 
     # Compute update.
-    if h.adapt == "NONE":
+    if h.adapt == "NO_ADAPT":
       w_delta.mult(momentum)
       if not no_reg and h.apply_l2_decay:
         self.ApplyL2Decay(w_delta, w, h.l2_decay, step=step, eps=epsilon, mom=momentum)

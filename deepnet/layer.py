@@ -8,7 +8,6 @@ import load_json_helpers
 from edge import Edge
 
 
-
 class Layer(parameter.Parameter):
     def __init__(self, opts, t_op=None, tied_to=None):
         assert isinstance(opts, load_json_helpers.LayerOpts)
@@ -221,7 +220,7 @@ class Layer(parameter.Parameter):
 
     def Show(self, train=False):
         """Displays useful statistics about the model."""
-        if not self.proto.hyperparams.enable_display:
+        if not self.opts.hyperparams.enable_display:
             return
         f = 1
         if self.hyperparams.dropout and not train:
