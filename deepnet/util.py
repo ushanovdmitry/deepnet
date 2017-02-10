@@ -9,6 +9,7 @@ import shutil
 import time
 from google.protobuf import text_format
 
+logfile = open('log.json.txt', 'w')
 
 def ParameterAsNumpy(param):
     """Converts a serialized parameter string into a numpy array."""

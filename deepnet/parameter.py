@@ -84,6 +84,13 @@ class Parameter(object):
     w_delta = self.gradient_history  # Previous update.
     gradient = self.gradient  # Current gradient.
 
+    print >> util.logfile, 'Parameter.Update:'
+    print >> util.logfile, '\t', param_name, self.name
+    print >> util.logfile, '\t', w.asarray().sum(), w_delta.asarray().sum(), gradient.asarray().sum()
+    print >> util.logfile, '\t', momentum, epsilon
+
+    util.logfile.flush()
+
     # Compute update.
     if h.adapt == "NO_ADAPT":
       w_delta.mult(momentum)

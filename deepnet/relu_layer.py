@@ -14,9 +14,6 @@ class ReluLayer(Layer):
     else:
       state = self.state
     state.lower_bound(0)
-    print '#' * 10
-    for k, v in sorted(vars(self).items()):
-        print k, ':', v
 
   def Sample(self, neg=False):
     if neg:
