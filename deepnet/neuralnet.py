@@ -1,13 +1,23 @@
 """Implements a feed-forward neural net."""
 import sys
 
-from convolutions import *
-from datahandler import *
-from sin_layer import *
-from soft_transfer_edge import *
-from util import *
+# from convolutions import *
+# from datahandler import *
+# from sin_layer import *
+# from soft_transfer_edge import *
+# from util import *
+
+from layer import Layer  # for typehints
+from edge import Edge  # for typehints
 
 import load_json_helpers
+import cudamat as cm
+import numpy as np
+
+from util import create_edge, create_layer
+from datahandler import GetDataHandles
+
+from util import Accumulate, GetPerformanceStats
 
 
 class NeuralNet(object):
@@ -148,8 +158,7 @@ class NeuralNet(object):
             layer.ApplyActivation()
             if layer.hyperparams.sparsity:
                 layer.state.sum(axis=1, target=layer.dimsize)
-                perf = deepnet_pb2.Metrics()
-                perf.MergeFrom(layer.proto.performance_stats)
+                perf = layer.opts.performance_stats.copy()
                 perf.count = layer.batchsize
                 perf.sparsity = layer.dimsize.sum() / layer.dimsize.shape[0]
 

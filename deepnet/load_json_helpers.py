@@ -1,3 +1,5 @@
+import copy
+
 class ConvolutionOpts:
     def __init__(self, opts):
         assert isinstance(opts, dict)
@@ -194,6 +196,9 @@ class MetricsOpts:
         attrs = vars(self)
         return '\n'.join("%s: %s" % item for item in attrs.items())
 
+    def copy(self):
+        return copy.deepcopy(self)
+
 
 class LayerOpts:
     def __init__(self, opts):
@@ -260,9 +265,6 @@ class ModelOpts:
         self.name = opts.pop("name")  #  required string name = 1;
         self.model_type = opts.pop("modelType")  #  required ModelType model_type = 2;
         self.layer = [LayerOpts(_) for _ in opts.pop("layer", [])]  #  repeated Layer layer = 3;
-
-        print self.layer
-        print self
 
         self.edge =[EdgeOpts(_) for _ in opts.pop("edge", [])]  #  repeated Edge edge = 4;
         self.hyperparams = HyperparamsOpts(opts.pop("hyperparams", {}))  #  optional Hyperparams hyperparams = 5;

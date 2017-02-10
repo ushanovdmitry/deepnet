@@ -1,7 +1,7 @@
 {
   "checkpointAfter": 10000000, 
   "stopcondition": {
-    "steps": 20000,
+    "steps": 5000,
     "allProcessed": false
   }, 
   "dataProto": "C:\\IMR\\model\\deepnet\\mnist\\mnist.pbtxt", 
