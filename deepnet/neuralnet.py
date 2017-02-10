@@ -13,23 +13,23 @@ import load_json_helpers
 class NeuralNet(object):
     def __init__(self, net_opts, t_op, e_op):
         self.net_opts = load_json_helpers.load_model(net_opts)
-        self.t_op = t_op
-        self.e_op = e_op
+        self.t_op = load_json_helpers.OperationOpts(t_op)
+        self.e_op = load_json_helpers.OperationOpts(e_op)
 
         cm.CUDAMatrix.init_random(self.net_opts.seed)
         np.random.seed(self.net_opts.seed)
 
         self.data = None
-        self.layer = []
-        self.edge = []
-        self.input_datalayer = []
-        self.output_datalayer = []
-        self.datalayer = []
-        self.tied_datalayer = []
-        self.unclamped_layer = []
+        self.layer = []  # type: list[Layer]
+        self.edge = []  # type: list[Edge]
+        self.input_datalayer = []  # type: list[Layer]
+        self.output_datalayer = []  # type: list[Layer]
+        self.datalayer = []  # type: list[Layer]
+        self.tied_datalayer = []  # type: list[Layer]
+        self.unclamped_layer = []  # type: list[Layer]
 
-        self.verbose = self.t_op["verbose"]
-        self.batchsize = self.t_op["batchsize"]
+        self.verbose = self.t_op.verbose
+        self.batchsize = self.t_op.batchsize
 
         self.train_stop_steps = sys.maxint
 
@@ -41,7 +41,7 @@ class NeuralNet(object):
     def deep_copy(self):
         return CopyModel(self.net)
 
-    def LoadModelOnGPU(self, *args, **kwargs):
+    def load_model_on_gpu(self, *args, **kwargs):
         """
             Load the model on the GPU.
         """
@@ -62,17 +62,14 @@ class NeuralNet(object):
                                            layer, self.t_op, tied_to=tied_to))
 
         for edge in self.net_opts.edge:
-            try:
-                node1 = next(layer for layer in self.layer if layer.name == edge.node1)
-            except StopIteration:
-                print edge.node1, [l.name for l in self.layer]
+            node1 = next(layer for layer in self.layer if layer.name == edge.node1)
             node2 = next(layer for layer in self.layer if layer.name == edge.node2)
             if not edge.prefix:
                 edge.prefix = self.net_opts.prefix
             tied_to = None
             if edge.tied:
                 tied_to = next(e for e in self.edge if e.node1.name == edge.tied_to_node1 and e.node2.name == edge.tied_to_node2)
-            self.edge.append(CreateEdge(Edge, edge, node1, node2, self.t_op, tied_to=tied_to))
+            self.edge.append(create_edge(edge, node1, node2, self.t_op, tied_to=tied_to))
 
         self.input_datalayer = [node for node in self.layer if node.is_input]
         self.output_datalayer = [node for node in self.layer if node.is_output]
@@ -117,6 +114,8 @@ class NeuralNet(object):
           step: Training step.
           maxsteps: Maximum number of steps that will be taken (Needed because some
             hyperparameters may depend on this).
+
+          :type layer: Layer
         """
         layer.dirty = False
         perf = None
@@ -134,7 +133,7 @@ class NeuralNet(object):
                         AddConvoleUp(inputs, edge, layer.state)
                 else:
                     w = edge.params['weight']
-                    factor = edge.proto.up_factor
+                    factor = edge.opts.up_factor
                     if i == 0:
                         cm.dot(w.T, inputs, target=layer.state)
                         if factor != 1:
@@ -215,8 +214,11 @@ class NeuralNet(object):
         Args:
           edge: The edge which is sending the derivative.
           deriv: The derivative w.r.t the inputs at the other end of this edge.
+
+          :type layer: Layer
+          :type edge: Edge
         """
-        if layer.is_input or edge.proto.block_gradient:
+        if layer.is_input or edge.opts.block_gradient:
             return
         if layer.dirty:  # If some derivatives have already been received.
             layer.deriv.add_dot(edge.params['weight'], deriv)
@@ -511,10 +513,10 @@ class NeuralNet(object):
                 continue
             if node.name in skip_layernames:
                 continue
-            data_field = node.proto.data_field
+            data_field = node.opts.data_field
             if data_field.tied:
                 self.tied_datalayer.append(node)
-                node.data_tied_to = next(l for l in self.datalayer \
+                node.data_tied_to = next(l for l in self.datalayer
                                          if l.name == data_field.tied_to)
             else:
                 self.datalayer.append(node)
@@ -537,7 +539,7 @@ class NeuralNet(object):
 
     def SetUpTrainer(self):
         """Load the model, setup the data, set the stopping conditions."""
-        self.LoadModelOnGPU()
+        self.load_model_on_gpu()
         if self.verbose:
             self.print_network()
         self.SetUpData()
@@ -581,14 +583,14 @@ class NeuralNet(object):
 
         collect_predictions = False
         try:
-            p = self.output_datalayer[0].proto.performance_stats
+            p = self.output_datalayer[0].opts.performance_stats
             if p.compute_MAP or p.compute_prec50:
                 collect_predictions = True
         except Exception as e:
             pass
-        select_model_using_error = self.net.hyperparams.select_model_using_error
-        select_model_using_acc = self.net.hyperparams.select_model_using_acc
-        select_model_using_map = self.net.hyperparams.select_model_using_map
+        select_model_using_error = self.net_opts.hyperparams.select_model_using_error
+        select_model_using_acc = self.net_opts.hyperparams.select_model_using_acc
+        select_model_using_map = self.net_opts.hyperparams.select_model_using_map
         select_best = select_model_using_error or select_model_using_acc or select_model_using_map
         if select_best:
             best_valid_error = float('Inf')

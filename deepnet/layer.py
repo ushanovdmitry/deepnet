@@ -5,11 +5,14 @@ import cudamat as cm
 import parameter
 
 import load_json_helpers
+from edge import Edge
+
 
 
 class Layer(parameter.Parameter):
     def __init__(self, opts, t_op=None, tied_to=None):
         assert isinstance(opts, load_json_helpers.LayerOpts)
+        assert isinstance(t_op, load_json_helpers.OperationOpts)
 
         super(Layer, self).__init__()
         self.tied_to = tied_to
@@ -20,15 +23,15 @@ class Layer(parameter.Parameter):
         self.state = None
         self.params = {}
         self.hyperparams = opts.hyperparams
-        self.incoming_edge = []
-        self.outgoing_edge = []
-        self.outgoing_neighbour = []
-        self.incoming_neighbour = []
+        self.incoming_edge = []  # type: list[Edge]
+        self.outgoing_edge = []  # type: list[Edge]
+        self.outgoing_neighbour = []  # type: list[Layer]
+        self.incoming_neighbour = []  # type: list[Layer]
         self.use_suff_stats = False
         self.fast_dropout_partner = None
         if t_op:
-            self.batchsize = t_op["batchsize"]
-            self.use_suff_stats = t_op["optimizer"] in ["PCD", "CD"]
+            self.batchsize = t_op.batchsize
+            self.use_suff_stats = t_op.optimizer in ["PCD", "CD"]
         else:
             self.batchsize = 0
         self.name = opts.name
@@ -108,11 +111,11 @@ class Layer(parameter.Parameter):
         if edge not in self.incoming_edge:
             self.incoming_edge.append(edge)
             if self == edge.node1:
-                neighbour = edge.node2
+                neighbour = edge.node2  # type: Layer
             else:
-                neighbour = edge.node1
+                neighbour = edge.node1  # type: Layer
             self.incoming_neighbour.append(neighbour)
-            if neighbour.proto.replicate_bias and neighbour.activation == deepnet_pb2.Hyperparams.REPLICATED_SOFTMAX:
+            if neighbour.opts.replicate_bias and neighbour.activation == "REPLICATED_SOFTMAX":
                 self.replicated_neighbour = neighbour
 
     def AddOutgoingEdge(self, edge):
@@ -186,14 +189,14 @@ class Layer(parameter.Parameter):
         self.state = cm.CUDAMatrix(np.zeros((numdims, batchsize)))
         self.deriv = cm.CUDAMatrix(np.zeros((numdims, batchsize)))
         if self.t_op:
-            if self.t_op["optimizer"] == "PCD":
+            if self.t_op.optimizer == "PCD":
                 self.pos_state = self.state
                 self.pos_sample = cm.CUDAMatrix(np.zeros((numdims, batchsize)))
                 self.neg_state = cm.CUDAMatrix(np.zeros((numdims, batchsize)))
                 self.neg_sample = cm.CUDAMatrix(np.zeros((numdims, batchsize)))
                 self.sample = self.pos_sample
                 self.suff_stats = cm.empty((numdims, 1))
-            elif self.t_op["optimizer"] == "CD":
+            elif self.t_op.optimizer == "CD":
                 self.sample = cm.CUDAMatrix(np.zeros((numdims, batchsize)))
                 self.suff_stats = cm.empty((numdims, 1))
         else:

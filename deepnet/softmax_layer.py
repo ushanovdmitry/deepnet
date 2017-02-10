@@ -1,4 +1,6 @@
 from layer import *
+import copy
+from load_json_helpers import MetricsOpts
 
 class SoftmaxLayer(Layer):
   def __init__(self, *args, **kwargs):
@@ -43,8 +45,7 @@ class SoftmaxLayer(Layer):
       get_deriv: If True, compute the derivative w.r.t the loss function and put
         it in self.deriv.
     """
-    perf = deepnet_pb2.Metrics()
-    perf.MergeFrom(self.proto.performance_stats)
+    perf = copy.deepcopy(self.opts.performance_stats)  # type: MetricsOpts
     perf.count = self.batchsize
     tiny = self.tiny
     batchsize = self.batchsize
@@ -57,7 +58,7 @@ class SoftmaxLayer(Layer):
     state.reshape((numlabels, dimensions * batchsize))
     data.reshape((1, dimensions * batchsize))
 
-    if self.loss_function == deepnet_pb2.Layer.CROSS_ENTROPY:
+    if self.loss_function == "CROSS_ENTROPY":
       temp = self.batchsize_temp
       
       # Compute correct predictions.
@@ -72,7 +73,7 @@ class SoftmaxLayer(Layer):
       if get_deriv:
         state.apply_softmax_grad(data, target=self.deriv)
 
-    elif self.loss_function == deepnet_pb2.Layer.SQUARED_LOSS:
+    elif self.loss_function == "SQUARED_LOSS":
       state.apply_softmax_grad(data, target=self.deriv)
       error = self.deriv.euclid_norm()**2
       perf.error = error

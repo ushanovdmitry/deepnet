@@ -281,6 +281,41 @@ class ModelOpts:
         assert len(opts) == 0, opts
 
 
+class StopConditionOpts:
+    def __init__(self, opts):
+        assert isinstance(opts, dict)
+
+        self.all_processed = opts.pop("allProcessed", False)  # optional bool all_processed = 1 [default=false];
+        self.steps = opts.pop("steps", 0)  # optional int32 steps = 2 [default=0];
+
+        assert len(opts) == 0, opts
+
+
+class OperationOpts:
+    def __init__(self, opts):
+        assert isinstance(opts, dict)
+
+        self.optimizer = opts.pop("optimizer", "GRADIENT_DESCENT")  # required Optimizer optimizer = 1;
+
+        self.stopcondition = StopConditionOpts(opts.pop("stopcondition", {}))  # required StopCondition stopcondition = 2;
+        self.train = opts.pop("train", False)  # optional bool train = 3 [default=false];
+        self.current_step = opts.pop("currentStep", 0)  # optional int32 current_step = 4 [default=0];
+        self.batchsize = opts.pop("batchsize", 1)  # optional int32 batchsize = 5 [default=1];
+        self.data_proto = opts.pop("dataProto", "")  # required string data_proto = 6;
+        self.eval_after = opts.pop("evalAfter", 1)  # optional int32 eval_after = 7 [default=1];
+        self.checkpoint_after = opts.pop("checkpointAfter", 1)  # optional int32 checkpoint_after = 8 [default=1];
+        self.checkpoint_directory = opts.pop("checkpointDirectory", None)  # optional string checkpoint_directory = 9 [default="/tmp/"];
+        self.skip_last_piece = opts.pop("skipLastPiece", True)  # optional bool skip_last_piece = 10 [default=true];
+        self.randomize = opts.pop("randomize", False)  # optional bool randomize = 14 [default=false];
+        self.show_after = opts.pop("showAfter", 0)  # optional int32 show_after = 15 [default=0];
+        self.verbose = opts.pop("verbose", False)  # optional bool verbose = 16 [default=false];
+        self.get_last_piece = opts.pop("getLastPiece", False)  # optional bool get_last_piece = 17 [default=false];
+        self.data_proto_prefix = opts.pop("dataProtoPrefix", "")  # optional string data_proto_prefix = 18;
+        self.checkpoint_prefix = opts.pop("checkpointPrefix", "")  # optional string checkpoint_prefix = 19;
+
+        assert len(opts) == 0, opts
+
+
 def load_missing(dict_main, dict_secondary):
     for k in dict_secondary.keys():
         if k not in dict_main:

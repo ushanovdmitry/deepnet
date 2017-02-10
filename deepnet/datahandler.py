@@ -10,6 +10,8 @@ import pdb
 import gzip
 import random
 
+import load_json_helpers
+
 class Disk(object):
   """A Disk access manager."""
   def __init__(self, filenames, numdim_list, total_size, keys=[], verbose=False,
@@ -451,6 +453,8 @@ def GetDataHandles(op, names, hyp_list, verbose=False):
   Returns:
     A list of DataHandler objects.
   """
+  assert isinstance(op, load_json_helpers.OperationOpts)
+
   typesize = 4
   data_proto_file = os.path.join(op.data_proto_prefix, op.data_proto)
   dataset_proto = util.ReadData(data_proto_file)

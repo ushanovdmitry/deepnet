@@ -129,7 +129,7 @@ message Hyperparams {
     ADAGRAD = 1;
   }
   optional Adapt adapt = 24 [default=NO_ADAPT];
-  optional int32 stop_dropout_for_last = 25 [default=0];
+  optional int32 stop_dropout_for_last = 25 [default=0]; // На скольких последних итерациях обучения не делать дропаут
   optional bool enable_display = 26 [default=false];
   optional bool normalize = 27 [default=false];
   optional float normalize_to = 28 [default=1.0];  // Replicated Softmax.

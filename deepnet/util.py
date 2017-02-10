@@ -181,11 +181,20 @@ def create_layer(activation, *args, **kwargs):
     return activation2layer[activation](*args, **kwargs)
 
 
-def CreateEdge(edge_class, proto, *args, **kwargs):
-    for cls in edge_class.__subclasses__():
-        if cls.IsEdgeType(proto):
-            return cls(proto, *args, **kwargs)
-    return edge_class(proto, *args, **kwargs)
+def create_edge(edge_opts, *args, **kwargs):
+    import load_json_helpers
+    assert isinstance(edge_opts, load_json_helpers.EdgeOpts)
+
+    if edge_opts.hyperparams.soft_shared_prior:
+        from soft_transfer_edge import SoftTransferEdge
+        return SoftTransferEdge(edge_opts, *args, **kwargs)
+    elif edge_opts.hyperparams.shared_prior:
+        from transfer_edge import TransferEdge
+        return TransferEdge(edge_opts, *args, **kwargs)
+    else:
+        from edge import Edge
+        return Edge(edge_opts, *args, **kwargs)
+
 
 
 def LoadMissing(p1, p2):
